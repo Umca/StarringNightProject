@@ -1,0 +1,19 @@
+html, body {
+    width:  100%;
+    height: 100%;
+    margin: 0px;
+}
+p{
+    position: absolute;
+    top: 577px;
+    left: 565px;
+
+}
+.panel{
+    position: absolute;
+    top: 615px;
+    width:1366px;
+}
+.panel div{
+    text-align: center;
+}
