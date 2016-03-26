@@ -63,7 +63,7 @@ canvas.add(ursaMajor);
 
 
 var leoMinorC = makeConstellation('M 40 120 L 60 110 L 80 118 L 60 126 L 40 120 M 80 118 L 105  112');
-var leoMinorT = naming("Малый лев", 110, 135);
+var leoMinorT = naming("Малый лев", 70, 140);
 var q1 = makeStars(3, 72, 125),
     q2 = makeStars(3, 89, 115),
     q3 = makeStars(3, 109, 125),
@@ -112,7 +112,7 @@ var e1 = makeStars(2, 86, 300),
 var sextans = new fabric.Group(
     [sextansC, sextansT, e1, e2, e3],{
         top: 295,
-        left:39,
+        left:19,
         id:"sextans",
         name:'секстант'
     });
@@ -213,7 +213,7 @@ var monoceros = new fabric.Group(
 canvas.add(monoceros);
 
 var canisMajorC = makeConstellation('M 280 350 L 295 353 L 315 355 M 295 353 L 281 395 L 271 405 M 281 395 L 295 403 L 319 405');
-var canisMajorT = naming('Большой пес', 240, 400);
+var canisMajorT = naming('Большой пес', 240, 360);
 var o1 = makeStars(2, 305, 376),
     o2 = makeStars(4, 317, 377),
     o3 = makeStars(2, 339, 381),
@@ -232,7 +232,7 @@ canvas.add(canisMajor);
 
 
 var puppisC = makeConstellation('M 230 390 L 245 392 L 237 440 L 275 440 L 265 465 L 237 440 M 265 465 L 275 467 L 305 463 L 295 490 L 275 467');
-var puppisT = naming('Корма', 310, 498);
+var puppisT = naming('Корма', 280, 468);
 var p1 = makeStars(2, 283, 441),
     p2 = makeStars(2, 268, 440),
     p3 = makeStars(2, 273, 487),
@@ -1437,18 +1437,47 @@ canvas._objectMap = canvas._objects.reduce(function(store, item){
     return store;
 }, {});
 
+function request(feature){
+    var xml = new XMLHttpRequest();
+    xml.open('GET', './data/data.json');
+    xml.onreadystatechange = function(){
+        if(xml.readyState === 4){
+            if(xml.status === 200){
+                data = JSON.parse(xml.responseText);
+                dataMap = data.reduce(function(store, item){
+                    store[item.id] = item;
+                    return store;
+                }, {});
+                for(prop in dataMap) {
+                    if (feature === dataMap[prop].id){
+                        var title = document.getElementById('title');
+                        title.innerHTML = dataMap[prop].name.toUpperCase();
+                        var description = document.getElementById('description');
+                        description.innerHTML = dataMap[prop].description;
+                    }
+                }
+                //console.log(data);
+            }
+        }
+    }
+    xml.send();
+
+}
+
 function changeColor(obj){
     obj._objects[0].stroke ="red";
     obj._objects[1].fill ="red";
     obj._objects[1].fontSize ="12";
     canvas.renderAll();
 }
+
 function search(event){
     event.preventDefault();
     var data_in = document.getElementById('input-search').value.toLowerCase();
         for (prop in canvas._objectMap) {
             if(canvas._objectMap[prop].name === data_in){
                 changeColor(canvas._objectMap[prop]);
+                request(canvas._objectMap[prop].id);
             }
         }
     }
@@ -1466,6 +1495,7 @@ function reverse(event){
 }
 var btn = document.getElementById('btn-search');
 btn.addEventListener('click', search);
+
 var input_search = document.getElementById('input-search');
 input_search.addEventListener('input', reverse);
 
@@ -1476,43 +1506,22 @@ field.addEventListener('click', function(event){
         xOffSet = window.pageXOffset;
         yOffSet = window.pageYOffset;
     for(prop in canvas._objectMap) {
-        var a = canvas._objectMap[prop],
-            x1 = a.getLeft(),
-            y1 = a.getTop(),
-            x2 = a.getLeft() + a.width + 10 ,
-            y2 = a.getTop() + a.height;
+        var a = canvas._objectMap[prop];
+        var x1 = a.getLeft();
+        var y1 = a.getTop();
+        var x2 = a.getLeft() + a.width + 10 ;
+        var y2 = a.getTop() + a.height;
 
 
-        if ((x > x1) && (x < x2) && (y > y1) && (y < y2)) {
-               var result = a.id;
+        if ((x >= x1) && (x <= x2) && (y >= y1) && (y <= y2)) {
+            var result = a.id;
             console.log(xOffSet);
             console.log(yOffSet);
             console.log(a.id, x, y, x1, y1, x2, y2);
         } else {
             console.log(x,y);
         }
+        request(result);
     }
-    var xml = new XMLHttpRequest();
-        xml.open('GET', './data/data.json');
-        xml.onreadystatechange = function(){
-            if(xml.readyState === 4){
-                if(xml.status === 200){
-                    data = JSON.parse(xml.responseText);
-                    dataMap = data.reduce(function(store, item){
-                        store[item.id] = item;
-                        return store;
-                    }, {});
-                    for(prop in dataMap) {
-                        if (result === dataMap[prop].id){
-                            var title = document.getElementById('title');
-                            title.innerHTML = dataMap[prop].name.toUpperCase();
-                            var description = document.getElementById('description');
-                            description.innerHTML = dataMap[prop].description;
-                        }
-                    }
-                    //console.log(data);
-                }
-            }
-        }
-        xml.send();
+
 });

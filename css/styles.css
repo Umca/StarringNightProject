@@ -3,6 +3,9 @@ html, body {
     height: 100%;
     margin: 0px;
 }
+canvas{
+    position: fixed;
+}
 p{
     position: absolute;
     top: 577px;
